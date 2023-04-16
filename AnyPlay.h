@@ -4,23 +4,23 @@
 
 #include <QMainWindow>
 
-
-
 QT_BEGIN_NAMESPACE
-namespace Ui { class AnyPlay; }
+namespace Ui {
+class AnyPlay;
+}
 QT_END_NAMESPACE
 
 class AnyPlay : public QMainWindow
 
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
-    AnyPlay(QWidget *parent = nullptr);
-    ~AnyPlay();
+ public:
+  AnyPlay(QWidget *parent = nullptr);
+  ~AnyPlay();
 
-private:
-    Ui::AnyPlay *ui;
+ private:
+  Ui::AnyPlay *ui;
 };
 
-#endif // ANYPLAY_H
+#endif  // ANYPLAY_H
