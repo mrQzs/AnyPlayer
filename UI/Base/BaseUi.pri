@@ -1,5 +1,11 @@
 INCLUDEPATH += $$PWD
 
-HEADERS += $$PWD/PushButton/BaseButton.h \
+HEADERS += \
+    $$PWD/LineEdit/LineEdit.h \
+    $$PWD/PushButton/PushButton.h \
+    $$PWD/Widget/Widget.h
 
-SOURCES += $$PWD/PushButton/BaseButton.cpp \
+SOURCES += \
+    $$PWD/LineEdit/LineEdit.cpp \
+    $$PWD/PushButton/PushButton.cpp \
+    $$PWD/Widget/Widgetdget.cpp
