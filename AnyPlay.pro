@@ -8,6 +8,17 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+QMAKE_CXXFLAGS_RELEASE += $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
+QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
+#win32{
+#    include(breakpad/breakpad.pri)
+#}
+#win64{
+#    include(breakpad/breakpad.pri)
+#}
+
+include(UI/Base/BaseUI.pri)
+
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
 }else{
@@ -49,7 +60,7 @@ SOURCES += \
     AnyPlay.cpp
 
 HEADERS += \
-    AnyPlay.h
+    AnyPlay.h \
 
 FORMS += \
     AnyPlay.ui
