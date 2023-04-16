@@ -1,5 +1,5 @@
 INCLUDEPATH += $$PWD
 
-HEADERS += $$PWD/BaseButton.h \
+HEADERS += $$PWD/PushButton/BaseButton.h \
 
-SOURCES += $$PWD/BaseButton.cpp \
+SOURCES += $$PWD/PushButton/BaseButton.cpp \
