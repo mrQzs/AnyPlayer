@@ -1,0 +1,11 @@
+/.qtc_clangd
+/build
+/debug
+/release
+/Makefile.Debug
+/Makefile.Release
+/.gitignore
+/.qmake.stash
+/Makefile
+/bin
+/AnyPlay.pro.user
