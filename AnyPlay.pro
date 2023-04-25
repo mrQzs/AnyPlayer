@@ -25,33 +25,95 @@ greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QMAKE_HOST.arch}
 }
 
-contains(TARGET_ARCH, x86_64){
-    CONFIG(debug, debug|release){
-        MOC_DIR = build/x64/moc/debug
-        OBJECTS_DIR = build/x64/obj/debug
-        RCC_DIR = build/x64/rcc/debug
-        UI_DIR = build/x64/ui/debug
-        DESTDIR = bin/x64/debug
+win32 {
+    contains(QMAKE_HOST.arch, x86_64) {
+        CONFIG(debug, debug|release){
+            MOC_DIR = build/win64/moc/debug
+            OBJECTS_DIR = build/win64/obj/debug
+            RCC_DIR = build/win64/rcc/debug
+            UI_DIR = build/win64/ui/debug
+            DESTDIR = bin/win64/debug
+        }else{
+            MOC_DIR = build/win64/moc/release
+            OBJECTS_DIR = build/win64/obj/release
+            RCC_DIR = build/win64/rcc/release
+            UI_DIR = build/win64/ui/release
+            DESTDIR = bin/win64/release
+        }
     }else{
-        MOC_DIR = build/x64/moc/release
-        OBJECTS_DIR = build/x64/obj/release
-        RCC_DIR = build/x64/rcc/release
-        UI_DIR = build/x64/ui/release
-        DESTDIR = bin/x64/release
+        CONFIG(debug, debug|release){
+            MOC_DIR = build/win32/moc/debug
+            OBJECTS_DIR = build/win32/obj/debug
+            RCC_DIR = build/win32/rcc/debug
+            UI_DIR = build/win32/ui/debug
+            DESTDIR = bin/win32/debug
+            }else{
+            MOC_DIR = build/win32/moc/release
+            OBJECTS_DIR = build/win32/obj/release
+            RCC_DIR = build/win32/rcc/release
+            UI_DIR = build/win32/ui/release
+            DESTDIR = bin/win32/release
+        }
     }
-}else{
+}
+
+linux-* {
+    contains(QMAKE_HOST.arch, x86_64) {
+    # Linux 64-bit specific settings
+    #LIBS += -L/path/to/linux64/libraries
+    #INCLUDEPATH += /path/to/linux64/includes
+
+        CONFIG(debug, debug|release){
+            MOC_DIR = build/linux64/moc/debug
+            OBJECTS_DIR = build/linux64/obj/debug
+            RCC_DIR = build/linux64/rcc/debug
+            UI_DIR = build/linux64/ui/debug
+            DESTDIR = bin/linux64/debug
+        }else{
+            MOC_DIR = build/linux64/moc/release
+            OBJECTS_DIR = build/linux64/obj/release
+            RCC_DIR = build/linux64/rcc/release
+            UI_DIR = build/linux64/ui/release
+            DESTDIR = bin/linux64/release
+        }
+    } else {
+        # Linux 32-bit specific settings
+        #LIBS += -L/path/to/linux32/libraries
+        #INCLUDEPATH += /path/to/linux32/includes
+
+        CONFIG(debug, debug|release){
+        MOC_DIR = build/linux32/moc/debug
+        OBJECTS_DIR = build/linux32/obj/debug
+        RCC_DIR = build/linux32/rcc/debug
+        UI_DIR = build/linux32/ui/debug
+        DESTDIR = bin/linux32/debug
+        }else{
+        MOC_DIR = build/linux32/moc/release
+        OBJECTS_DIR = build/linux32/obj/release
+        RCC_DIR = build/linux32/rcc/release
+        UI_DIR = build/linux32/ui/release
+        DESTDIR = bin/linux32/release
+        }
+    }
+}
+
+macx {
+#    # macOS-specific settings
+#    LIBS += -L/path/to/macOS/libraries
+#    INCLUDEPATH += /path/to/macOS/includes
+
     CONFIG(debug, debug|release){
-        MOC_DIR = build/win32/moc/debug
-        OBJECTS_DIR = build/win32/obj/debug
-        RCC_DIR = build/win32/rcc/debug
-        UI_DIR = build/win32/ui/debug
-        DESTDIR = bin/win32/debug
+        MOC_DIR = build/linux32/moc/debug
+        OBJECTS_DIR = build/linux32/obj/debug
+        RCC_DIR = build/linux32/rcc/debug
+        UI_DIR = build/linux32/ui/debug
+        DESTDIR = bin/linux32/debug
     }else{
-        MOC_DIR = build/win32/moc/release
-        OBJECTS_DIR = build/win32/obj/release
-        RCC_DIR = build/win32/rcc/release
-        UI_DIR = build/win32/ui/release
-        DESTDIR = bin/win32/release
+        MOC_DIR = build/linux32/moc/release
+        OBJECTS_DIR = build/linux32/obj/release
+        RCC_DIR = build/linux32/rcc/release
+        UI_DIR = build/linux32/ui/release
+        DESTDIR = bin/linux32/release
     }
 }
 

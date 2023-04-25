@@ -10,14 +10,15 @@ class AnyPlay;
 }
 QT_END_NAMESPACE
 
-class AnyPlay : public QMainWindow
-
-{
+class AnyPlay : public QMainWindow {
   Q_OBJECT
 
  public:
   AnyPlay(QWidget *parent = nullptr);
   ~AnyPlay();
+
+ private:
+  void hideTitle();
 
  private:
   Ui::AnyPlay *ui;
