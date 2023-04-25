@@ -27,6 +27,10 @@ greaterThan(QT_MAJOR_VERSION,4){
 
 win32 {
     contains(QMAKE_HOST.arch, x86_64) {
+    # Linux 64-bit specific settings
+    #LIBS += -L/path/to/win64/libraries
+    #INCLUDEPATH += /path/to/win64/includes
+
         CONFIG(debug, debug|release){
             MOC_DIR = build/win64/moc/debug
             OBJECTS_DIR = build/win64/obj/debug
@@ -41,6 +45,10 @@ win32 {
             DESTDIR = bin/win64/release
         }
     }else{
+    # Linux 32-bit specific settings
+    #LIBS += -L/path/to/win32/libraries
+    #INCLUDEPATH += /path/to/win32/includes
+
         CONFIG(debug, debug|release){
             MOC_DIR = build/win32/moc/debug
             OBJECTS_DIR = build/win32/obj/debug
