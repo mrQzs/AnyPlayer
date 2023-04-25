@@ -26,6 +26,9 @@ greaterThan(QT_MAJOR_VERSION,4){
 }
 
 win32 {
+    LIBS += -L $$PWD/ffmpeg/win/lib -lavcodec -lavformat -lavutil -lswscale
+    INCLUDEPATH += $$PWD/ffmpeg/win/include
+
     contains(QMAKE_HOST.arch, x86_64) {
     # Linux 64-bit specific settings
     #LIBS += -L/path/to/win64/libraries
@@ -55,7 +58,7 @@ win32 {
             RCC_DIR = build/win32/rcc/debug
             UI_DIR = build/win32/ui/debug
             DESTDIR = bin/win32/debug
-            }else{
+        }else{
             MOC_DIR = build/win32/moc/release
             OBJECTS_DIR = build/win32/obj/release
             RCC_DIR = build/win32/rcc/release
@@ -90,17 +93,17 @@ linux-* {
         #INCLUDEPATH += /path/to/linux32/includes
 
         CONFIG(debug, debug|release){
-        MOC_DIR = build/linux32/moc/debug
-        OBJECTS_DIR = build/linux32/obj/debug
-        RCC_DIR = build/linux32/rcc/debug
-        UI_DIR = build/linux32/ui/debug
-        DESTDIR = bin/linux32/debug
+            MOC_DIR = build/linux32/moc/debug
+            OBJECTS_DIR = build/linux32/obj/debug
+            RCC_DIR = build/linux32/rcc/debug
+            UI_DIR = build/linux32/ui/debug
+            DESTDIR = bin/linux32/debug
         }else{
-        MOC_DIR = build/linux32/moc/release
-        OBJECTS_DIR = build/linux32/obj/release
-        RCC_DIR = build/linux32/rcc/release
-        UI_DIR = build/linux32/ui/release
-        DESTDIR = bin/linux32/release
+            MOC_DIR = build/linux32/moc/release
+            OBJECTS_DIR = build/linux32/obj/release
+            RCC_DIR = build/linux32/rcc/release
+            UI_DIR = build/linux32/ui/release
+            DESTDIR = bin/linux32/release
         }
     }
 }
