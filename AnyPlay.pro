@@ -17,8 +17,6 @@ QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 #    include(breakpad/breakpad.pri)
 #}
 
-include(UI/Base/BaseUI.pri)
-
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
 }else{
@@ -129,11 +127,18 @@ macx {
 }
 
 SOURCES += \
+    AudioDecode.cpp \
+    VideoDecode.cpp \
+    VideoPlayWidget.cpp \
     main.cpp \
     AnyPlay.cpp
 
 HEADERS += \
     AnyPlay.h \
+    AudioDecode.h \
+    VideoDecode.h \
+    VideoPlayWidget.h \
+    ffmpegIn.h
 
 FORMS += \
     AnyPlay.ui
