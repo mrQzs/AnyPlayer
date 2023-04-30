@@ -2,22 +2,43 @@
 #ifndef VIDEODECODE_H
 #define VIDEODECODE_H
 
-class VideoDecode {
+#include <ffmpegIn.h>
+
+#include <QAtomicInt>
+#include <QImage>
+#include <QThread>
+
+class QImage;
+
+class VideoDecode : public QThread {
+  Q_OBJECT
  public:
-  // 禁止拷贝构造函数和赋值操作符
+  VideoDecode(QObject *parent = nullptr);
+  ~VideoDecode();
   VideoDecode(const VideoDecode &) = delete;
   VideoDecode &operator=(const VideoDecode &) = delete;
 
-  // 获取单例实例的全局访问点
-  static VideoDecode &getInstance();
-
  public:
-  void test();
+  void setStopFlag();
+  void setSetFile(const QString &file);
+
+  // QThread interface
+ protected:
+  void run();
+
+ signals:
+  void getNewImage(QImage *image);
 
  private:
-  // 将构造函数和析构函数设为私有，禁止外部创建和删除实例
-  VideoDecode();
-  ~VideoDecode();
+  void decode();
+
+  QImage avFrameToQImage(AVFrame *frame);
+
+ private:
+  QAtomicInt m_stopFlag;
+  QAtomicInt m_isDecode;
+  QString m_file;
+  // QList<QImage> m_img;
 };
 
 #endif  // VIDEODECODE_H

@@ -1,7 +1,7 @@
 
-#include <ffmpegIn.h>
 
 #include <QApplication>
+#include <QMetaType>
 
 #include "AnyPlay.h"
 
@@ -10,6 +10,10 @@
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
+
+  // 注册 QImage* 类型
+  qRegisterMetaType<QImage *>("QImage*");
+
   AnyPlay w;
   w.show();
   return a.exec();
