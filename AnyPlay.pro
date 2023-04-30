@@ -10,6 +10,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 QMAKE_CXXFLAGS_RELEASE += $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
+
 #win32{
 #    include(breakpad/breakpad.pri)
 #}
@@ -17,7 +18,7 @@ QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 #    include(breakpad/breakpad.pri)
 #}
 
-INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD/3rdpart
 
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
@@ -129,22 +130,21 @@ macx {
 }
 
 SOURCES += \
-    AudioDecode.cpp \
-    DecodeThread.cpp \
-    Logger.cpp \
+    Decode/AudioDecode.cpp \
+    Decode/DecodeThread.cpp \
+    Decode/VideoDecode.cpp \
     UpateTimer.cpp \
-    VideoDecode.cpp \
     VideoPlayWidget.cpp \
     main.cpp \
     AnyPlay.cpp
 
 HEADERS += \
     AnyPlay.h \
-    AudioDecode.h \
-    DecodeThread.h \
-    Logger.h \
+    Decode/AudioDecode.h \
+    Decode/DecodeThread.h \
+    Decode/VideoDecode.h \
+    Log/Logger.hpp \
     UpateTimer.h \
-    VideoDecode.h \
     VideoPlayWidget.h \
     ffmpegIn.h
 

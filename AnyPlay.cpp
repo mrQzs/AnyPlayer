@@ -10,7 +10,7 @@
 #include <Qthread>
 
 // #include "DecodeThread.h"
-#include "VideoDecode.h"
+#include "Decode/VideoDecode.h"
 #include "ui_AnyPlay.h"
 
 QImage avFrameToQImage(AVFrame *frame);
