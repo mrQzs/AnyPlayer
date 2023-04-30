@@ -16,3 +16,4 @@
 /bin/win32/debug/*.exe
 /bin/win32/release/*.exe
 /bin/win64/release/*.exe
+/bin/win64/debug/Log/*.txt

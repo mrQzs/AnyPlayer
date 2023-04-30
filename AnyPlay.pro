@@ -12,13 +12,17 @@ QMAKE_CXXFLAGS_RELEASE += $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
 #win32{
-#    include(breakpad/breakpad.pri)
+#
 #}
 #win64{
 #    include(breakpad/breakpad.pri)
 #}
 
 INCLUDEPATH += $$PWD/3rdpart
+INCLUDEPATH += $$PWD/Config
+INCLUDEPATH += $$PWD/Decode
+INCLUDEPATH += $$PWD/Log
+INCLUDEPATH += $$PWD/Timer
 
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
@@ -29,6 +33,7 @@ greaterThan(QT_MAJOR_VERSION,4){
 win32 {
     LIBS += -L $$PWD/ffmpeg/win/lib -lavcodec -lavformat -lavutil -lswscale
     INCLUDEPATH += $$PWD/ffmpeg/win/include
+    #include(3rdpart/breakpad/breakpad.pri)
 
     contains(QMAKE_HOST.arch, x86_64) {
     # Linux 64-bit specific settings
@@ -49,10 +54,6 @@ win32 {
             DESTDIR = bin/win64/release
         }
     }else{
-    # Linux 32-bit specific settings
-    #LIBS += -L/path/to/win32/libraries
-    #INCLUDEPATH += /path/to/win32/includes
-
         CONFIG(debug, debug|release){
             MOC_DIR = build/win32/moc/debug
             OBJECTS_DIR = build/win32/obj/debug
@@ -133,7 +134,7 @@ SOURCES += \
     Decode/AudioDecode.cpp \
     Decode/DecodeThread.cpp \
     Decode/VideoDecode.cpp \
-    UpateTimer.cpp \
+    Timer/UpateTimer.cpp \
     VideoPlayWidget.cpp \
     main.cpp \
     AnyPlay.cpp
@@ -144,8 +145,9 @@ HEADERS += \
     Decode/DecodeThread.h \
     Decode/VideoDecode.h \
     Log/Logger.hpp \
-    UpateTimer.h \
+    Timer/UpateTimer.h \
     VideoPlayWidget.h \
+    Config/INIReader.hpp \
     ffmpegIn.h
 
 FORMS += \

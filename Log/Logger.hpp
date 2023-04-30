@@ -2,6 +2,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <QDir>
 #include <QMetaType>
 #include <chrono>
 #include <condition_variable>
@@ -18,26 +19,16 @@
 #include <thread>
 #include <unordered_map>
 
+#include "INIReader.hpp"
 #include "boost/lockfree/spsc_queue.hpp"
-//// #include "ini.h"
 
 class Logger {
  public:
   enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
 
-  Logger(const std::string &filename, LogLevel logLevel = LogLevel::DEBUG,
-         size_t maxFileSize = 10 * 1024 * 1024)
-      : m_filename(filename),
-        m_logLevel(logLevel),
-        m_maxFileSize(maxFileSize),
-        m_logQueue(1024),
-        m_writeThread(&Logger::writeLogLoop, this) {
-    qRegisterMetaType<LogLevel>("LogLevel");
-  }
-
-  ~Logger() {
-    m_exitFlag.store(true);
-    m_writeThread.join();
+  static Logger &getInstance() {
+    static Logger logger;
+    return logger;
   }
 
   void log(const std::string &group, const std::string &message,
@@ -50,34 +41,38 @@ class Logger {
     }
   }
 
-  static Logger &instance() {
-    static Logger logger("logfile.log", LogLevel::DEBUG);
-    return logger;
-  }
-
   // 加载配置文件
   void loadConfig(const std::string &configFile) {
-    //    INIReader reader(configFile);
+    INIReader reader(configFile);
 
-    //    if (reader.ParseError() < 0) {
-    //      std::cerr << "Error: Can't load config file: " << configFile <<
-    //      std::endl; return;
-    //    }
+    if (!reader.parseError()) {
+      std::cerr << "Error: Can't load config file: " << configFile << std::endl;
+      return;
+    }
 
-    //    m_filename = reader.Get("logger", "filename", "logfile.log");
-    //    m_logLevel = stringToLevel(reader.Get("logger", "log_level",
-    //    "DEBUG")); m_maxFileSize = static_cast<size_t>(
-    //        reader.GetInteger("logger", "max_file_size", 10 * 1024 * 1024));
+    m_logLevel = stringToLevel(reader.get("logger", "log_level", "DEBUG"));
+    m_maxFileSize = static_cast<size_t>(
+        reader.getInt("logger", "max_file_size", 10 * 1024 * 1024));
   }
 
  private:
-  std::string m_filename;
-  LogLevel m_logLevel;
-  size_t m_maxFileSize;
-  boost::lockfree::spsc_queue<std::string> m_logQueue;
-  std::thread m_writeThread;
-  std::atomic<bool> m_exitFlag{false};
+  Logger(LogLevel logLevel = LogLevel::DEBUG,
+         size_t maxFileSize = 10 * 1024 * 1024)
+      : m_logLevel(logLevel),
+        m_maxFileSize(maxFileSize),
+        m_logQueue(1024),
+        m_writeThread(&Logger::writeLogLoop, this) {
+    qRegisterMetaType<LogLevel>("LogLevel");
+  }
 
+  ~Logger() {
+    m_exitFlag.store(true);
+    m_writeThread.join();
+  }
+
+  LogLevel &operator=(const LogLevel &) = delete;
+
+ private:
   std::string formatTimestamp() {
     auto now = std::chrono::system_clock::now();
     auto nowTimeT = std::chrono::system_clock::to_time_t(now);
@@ -153,19 +148,33 @@ class Logger {
   }
 
   void writeFile(const std::string &message) {
-    std::ofstream file(m_filename, std::ios::app | std::ios::ate);
-    if (!file.is_open()) {
-      throw std::runtime_error("Failed to open log file");
-    }
+    // 获取当前日期
+    std::time_t t = std::time(nullptr);
+    char date[100];
+    if (std::strftime(date, sizeof(date), "%Y-%m-%d", std::localtime(&t))) {
+      // 按照日期生成日志文件名
+      QString LogPath = QDir::currentPath() + "/Log/log-";
 
-    file << message << std::endl;
+      std::string filename = LogPath.toStdString() + std::string(date) + ".txt";
 
-    if (file.tellp() >= static_cast<std::streamoff>(m_maxFileSize)) {
-      file.close();
-      std::string newFilename = m_filename + ".old";
-      std::rename(m_filename.c_str(), newFilename.c_str());
+      std::ofstream logFile(filename, std::ios::app);
+      if (logFile.is_open()) {
+        logFile << message << std::endl;
+        logFile.close();
+      } else {
+        std::cerr << "Error opening log file: " << filename << std::endl;
+      }
+    } else {
+      std::cerr << "Error getting current date for log file name" << std::endl;
     }
   }
+
+ private:
+  LogLevel m_logLevel;
+  size_t m_maxFileSize;
+  boost::lockfree::spsc_queue<std::string> m_logQueue;
+  std::thread m_writeThread;
+  std::atomic<bool> m_exitFlag{false};
 };
 
 #endif  // LOGGER_H
