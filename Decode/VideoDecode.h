@@ -18,7 +18,6 @@ class VideoDecode : public QThread {
   void setStopFlag();
   void setSetFile(const QString &file);
 
-  // QThread interface
  protected:
   void run();
 
@@ -33,13 +32,11 @@ class VideoDecode : public QThread {
 
  private:
   void decode();
-  QImage avFrameToQImage(AVFrame *frame);
 
  private:
   QAtomicInt m_stopFlag;
   QAtomicInt m_isDecode;
   QString m_file;
-  // QList<QImage> m_img;
 };
 
 #endif  // VIDEODECODE_H

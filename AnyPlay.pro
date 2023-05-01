@@ -24,6 +24,8 @@ INCLUDEPATH += $$PWD/Decode
 INCLUDEPATH += $$PWD/Log
 INCLUDEPATH += $$PWD/Timer
 
+
+
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
 }else{
@@ -34,8 +36,11 @@ win32 {
     #include(3rdpart/breakpad/breakpad.pri)
 
     contains(QMAKE_HOST.arch, x86_64) {
-        LIBS += -L $$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale
+        LIBS += -L $$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale -lswresample
         INCLUDEPATH += $$PWD/ffmpeg/win64/include
+
+        INCLUDEPATH +=  $$PWD/3rdpart/SDL2/win64/include
+        LIBS += -L$$PWD/3rdpart/SDL2/win64/lib -lSDL2
 
         CONFIG(debug, debug|release){
             MOC_DIR = build/win64/moc/debug
@@ -131,7 +136,7 @@ SOURCES += \
     Decode/AudioDecode.cpp \
     Decode/DecodeThread.cpp \
     Decode/VideoDecode.cpp \
-    Helper.cpp \
+    Helper/Helper.cpp \
     Timer/UpateTimer.cpp \
     VideoPlayWidget.cpp \
     main.cpp \
@@ -142,7 +147,7 @@ HEADERS += \
     Decode/AudioDecode.h \
     Decode/DecodeThread.h \
     Decode/VideoDecode.h \
-    Helper.h \
+    Helper/Helper.h \
     Log/Logger.hpp \
     Timer/UpateTimer.h \
     VideoPlayWidget.h \
