@@ -28,7 +28,7 @@ class VideoPlayWidget : public QWidget {
  private:
   QQueue<QImage *> m_queue;
   QImage m_image;
-  UpateTimer *m_timer;
+  UpateTimer &m_timer;
 };
 
 #endif  // VIDEOPLAYWIDGET_H

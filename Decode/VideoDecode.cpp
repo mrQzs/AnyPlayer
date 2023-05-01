@@ -5,10 +5,13 @@
 #include <QImage>
 #include <QThread>
 
-VideoDecode::VideoDecode(QObject *parent)
-    : QThread(parent), m_stopFlag(0), m_isDecode(0) {}
+#include "Logger.hpp"
+#include "UpateTimer.h"
 
-VideoDecode::~VideoDecode() {}
+VideoDecode &VideoDecode::getInstance() {
+  static VideoDecode instance;
+  return instance;
+}
 
 void VideoDecode::setStopFlag() { m_stopFlag.storeRelaxed(1); }
 
@@ -18,30 +21,49 @@ void VideoDecode::setSetFile(const QString &file) {
 }
 
 void VideoDecode::run() {
-  qDebug() << "视频解码线程启动";
+  Logger::getInstance().log(VideoDecode::tr("线程"),
+                            VideoDecode::tr("视频解码线程启动"),
+                            LogLevel::INFO);
+
   while (!m_stopFlag.loadAcquire()) {
     if (m_isDecode.loadAcquire()) {
       m_isDecode.storeRelaxed(0);
       decode();
     }
   }
-  qDebug() << "视频解码线程停止";
+
+  Logger::getInstance().log(VideoDecode::tr("线程"),
+                            VideoDecode::tr("视频解码线程结束"),
+                            LogLevel::INFO);
 }
+
+VideoDecode::VideoDecode(QObject *parent)
+    : QThread(parent), m_stopFlag(0), m_isDecode(0) {}
+
+VideoDecode::~VideoDecode() {}
 
 void VideoDecode::decode() {
   AVFormatContext *formatContext = nullptr;
   if (avformat_open_input(&formatContext, m_file.toLocal8Bit().constData(),
                           nullptr, nullptr) != 0) {
-    qDebug() << "创建AVFormatContext失败";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("创建AVFormatContext失败"),
+                              LogLevel::INFO);
     return;
   } else
-    qDebug() << "创建AVFormatContext成功";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("创建AVFormatContext成功"),
+                              LogLevel::INFO);
 
   if (avformat_find_stream_info(formatContext, nullptr) < 0) {
-    qDebug() << "检索流信息失败";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("检索流信息失败"),
+                              LogLevel::INFO);
     return;
   } else
-    qDebug() << "检索流信息成功";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("检索流信息成功"),
+                              LogLevel::INFO);
 
   int videoStreamIndex = -1;
   for (unsigned int i = 0; i < formatContext->nb_streams; i++) {
@@ -52,29 +74,46 @@ void VideoDecode::decode() {
   }
 
   if (videoStreamIndex == -1) {
-    qDebug() << "未找到视频流";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("未找到视频流"), LogLevel::INFO);
     return;
   } else
-    qDebug() << "找到视频流";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("找到视频流"), LogLevel::INFO);
 
   AVCodecParameters *codecParameters =
       formatContext->streams[videoStreamIndex]->codecpar;
   const AVCodec *codec = avcodec_find_decoder(codecParameters->codec_id);
 
   if (!codec) {
-    qDebug() << "未找到编解码器";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("未找到编解码器"),
+                              LogLevel::INFO);
     return;
   } else
-    qDebug() << "找到编解码器";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("找到编解码器"), LogLevel::INFO);
 
   AVCodecContext *codecContext = avcodec_alloc_context3(codec);
   avcodec_parameters_to_context(codecContext, codecParameters);
 
   if (avcodec_open2(codecContext, codec, nullptr) < 0) {
-    qDebug() << "创建AVCodecContext失败";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("创建AVCodecContext失败"),
+                              LogLevel::INFO);
     return;
   } else
-    qDebug() << "创建AVCodecContext成功";
+    Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                              VideoDecode::tr("创建AVCodecContext成功"),
+                              LogLevel::INFO);
+
+  AVStream **stream = formatContext->streams;
+  int den = (*stream)->avg_frame_rate.den;
+  int num = (*stream)->avg_frame_rate.num;
+  float rate = (float)num / (float)den;
+  float freq = 1000.0 / rate;
+
+  UpateTimer::getInstance().setFreq(freq);
 
   AVFrame *frame = av_frame_alloc();
   AVPacket packet;
@@ -84,7 +123,9 @@ void VideoDecode::decode() {
       // 发送包到解码器
       if (avcodec_send_packet(codecContext, &packet) != 0) {
         // 错误处理
-        qDebug() << "发送包到解码器失败";
+        Logger::getInstance().log(VideoDecode::tr("视频解码"),
+                                  VideoDecode::tr("发送包到解码器失败"),
+                                  LogLevel::INFO);
       } else {
         while (avcodec_receive_frame(codecContext, frame) == 0) {
           auto image = new QImage(avFrameToQImage(frame));

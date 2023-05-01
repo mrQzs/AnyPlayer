@@ -12,13 +12,9 @@ class QImage;
 
 class VideoDecode : public QThread {
   Q_OBJECT
- public:
-  VideoDecode(QObject *parent = nullptr);
-  ~VideoDecode();
-  VideoDecode(const VideoDecode &) = delete;
-  VideoDecode &operator=(const VideoDecode &) = delete;
 
  public:
+  static VideoDecode &getInstance();
   void setStopFlag();
   void setSetFile(const QString &file);
 
@@ -30,8 +26,13 @@ class VideoDecode : public QThread {
   void getNewImage(QImage *image);
 
  private:
-  void decode();
+  VideoDecode(QObject *parent = nullptr);
+  ~VideoDecode();
+  VideoDecode(const VideoDecode &) = delete;
+  VideoDecode &operator=(const VideoDecode &) = delete;
 
+ private:
+  void decode();
   QImage avFrameToQImage(AVFrame *frame);
 
  private:

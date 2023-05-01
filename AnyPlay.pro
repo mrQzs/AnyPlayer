@@ -31,14 +31,11 @@ greaterThan(QT_MAJOR_VERSION,4){
 }
 
 win32 {
-    LIBS += -L $$PWD/ffmpeg/win/lib -lavcodec -lavformat -lavutil -lswscale
-    INCLUDEPATH += $$PWD/ffmpeg/win/include
     #include(3rdpart/breakpad/breakpad.pri)
 
     contains(QMAKE_HOST.arch, x86_64) {
-    # Linux 64-bit specific settings
-    #LIBS += -L/path/to/win64/libraries
-    #INCLUDEPATH += /path/to/win64/includes
+        LIBS += -L $$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale
+        INCLUDEPATH += $$PWD/ffmpeg/win64/include
 
         CONFIG(debug, debug|release){
             MOC_DIR = build/win64/moc/debug
@@ -134,6 +131,7 @@ SOURCES += \
     Decode/AudioDecode.cpp \
     Decode/DecodeThread.cpp \
     Decode/VideoDecode.cpp \
+    Helper.cpp \
     Timer/UpateTimer.cpp \
     VideoPlayWidget.cpp \
     main.cpp \
@@ -144,6 +142,7 @@ HEADERS += \
     Decode/AudioDecode.h \
     Decode/DecodeThread.h \
     Decode/VideoDecode.h \
+    Helper.h \
     Log/Logger.hpp \
     Timer/UpateTimer.h \
     VideoPlayWidget.h \

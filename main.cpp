@@ -24,9 +24,6 @@ int main(int argc, char *argv[]) {
 
   initDir();
 
-  Logger &log = Logger::getInstance();
-  log.log("测试", "开始测试", Logger::LogLevel::DEBUG);
-
   AnyPlay w;
   w.show();
   return a.exec();

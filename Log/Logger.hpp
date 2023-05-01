@@ -22,21 +22,20 @@
 #include "INIReader.hpp"
 #include "boost/lockfree/spsc_queue.hpp"
 
+enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
+
 class Logger {
  public:
-  enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL };
-
   static Logger &getInstance() {
     static Logger logger;
     return logger;
   }
 
-  void log(const std::string &group, const std::string &message,
-           LogLevel level) {
+  void log(const QString &group, const QString &message, LogLevel level) {
     if (level >= m_logLevel) {
       std::stringstream ss;
       ss << "[" << formatTimestamp() << "] [" << levelToString(level) << "] ["
-         << group << "] " << message;
+         << group.toStdString() << "] " << message.toStdString();
       m_logQueue.push(ss.str());
     }
   }

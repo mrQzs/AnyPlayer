@@ -6,15 +6,22 @@
 #include <chrono>
 #include <thread>
 
-UpateTimer::UpateTimer(QObject *parent)
-    : QThread(parent), m_timer(nullptr), m_stopFlag(0) {}
+#include "Logger.hpp"
 
-UpateTimer::~UpateTimer() {}
+UpateTimer &UpateTimer::getInstance() {
+  static UpateTimer instance;
+  return instance;
+}
 
 void UpateTimer::setStopFlag() { m_stopFlag.storeRelaxed(1); }
 
+void UpateTimer::setFreq(int freq) { m_freq = freq; }
+
+int UpateTimer::getFreq() { return m_freq; }
+
 void UpateTimer::run() {
-  qDebug() << "界面更新线程开始";
+  Logger::getInstance().log(UpateTimer::tr("线程"),
+                            UpateTimer::tr("界面更新线程开始"), LogLevel::INFO);
 
   using namespace std::chrono;
 
@@ -25,7 +32,7 @@ void UpateTimer::run() {
     auto duration =
         duration_cast<milliseconds>(now - start).count();  // 计算经过的时间
 
-    if (duration >= 25) {  // 检查是否达到指定的计时器间隔（例如，1000毫秒）
+    if (duration >= m_freq) {  // 检查是否达到指定的计时器间隔（例如，1000毫秒）
       emit timeout();
       start = now;  // 更新开始时间
     }
@@ -34,5 +41,10 @@ void UpateTimer::run() {
     std::this_thread::sleep_for(milliseconds(1));
   }
 
-  qDebug() << "界面更新线程结束";
+  Logger::getInstance().log(UpateTimer::tr("线程"),
+                            UpateTimer::tr("界面更新线程结束"), LogLevel::INFO);
 }
+
+UpateTimer::UpateTimer() : m_timer(nullptr), m_stopFlag(0), m_freq(41) {}
+
+UpateTimer::~UpateTimer() {}

@@ -42,7 +42,7 @@ class AnyPlay : public QMainWindow {
   Ui::AnyPlay *ui;
   // DecodeThread *m_decodeThread;
   // QThread *m_ddthread;
-  VideoDecode *m_decode;
+  VideoDecode &m_decode;
 };
 
 #endif  // ANYPLAY_H
