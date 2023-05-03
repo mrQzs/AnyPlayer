@@ -21,6 +21,7 @@ QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 INCLUDEPATH += $$PWD/3rdpart
 INCLUDEPATH += $$PWD/Config
 INCLUDEPATH += $$PWD/Decode
+INCLUDEPATH += $$PWD/Global
 INCLUDEPATH += $$PWD/Log
 INCLUDEPATH += $$PWD/Timer
 
@@ -134,25 +135,25 @@ macx {
 
 SOURCES += \
     Decode/AudioDecode.cpp \
-    Decode/DecodeThread.cpp \
+    Decode/Decode.cpp \
     Decode/VideoDecode.cpp \
-    Helper/Helper.cpp \
     Timer/UpateTimer.cpp \
     VideoPlayWidget.cpp \
+    Global/GlobalVar.cpp \
     main.cpp \
     AnyPlay.cpp
 
 HEADERS += \
     AnyPlay.h \
     Decode/AudioDecode.h \
-    Decode/DecodeThread.h \
+    Decode/Decode.h \
     Decode/VideoDecode.h \
-    Helper/Helper.h \
     Log/Logger.hpp \
     Timer/UpateTimer.h \
     VideoPlayWidget.h \
     Config/INIReader.hpp \
-    ffmpegIn.h
+    ffmpegIn.h \
+    Global/GlobalVar.h
 
 FORMS += \
     AnyPlay.ui

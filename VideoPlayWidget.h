@@ -3,7 +3,6 @@
 #define VIDEOPLAYWIDGET_H
 
 #include <QPainter>
-#include <QQueue>
 #include <QTimer>
 #include <QWidget>
 
@@ -16,17 +15,10 @@ class VideoPlayWidget : public QWidget {
   explicit VideoPlayWidget(QWidget *parent = nullptr);
   ~VideoPlayWidget();
 
- public:
-  void setImage(QImage *image);
-
- public slots:
-  void drawImg();
-
  protected:
   void paintEvent(QPaintEvent *) override;
 
  private:
-  QQueue<QImage *> m_queue;
   QImage m_image;
   UpateTimer &m_timer;
 };

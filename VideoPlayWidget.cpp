@@ -1,6 +1,9 @@
 
 #include "VideoPlayWidget.h"
 
+#include <GlobalVar.h>
+
+#include <QDebug>
 #include <QThread>
 
 #include "UpateTimer.h"
@@ -16,15 +19,11 @@ VideoPlayWidget::~VideoPlayWidget() {
   m_timer.wait();
 }
 
-void VideoPlayWidget::setImage(QImage *image) { m_queue.enqueue(image); }
-
-void VideoPlayWidget::drawImg() {}
-
 void VideoPlayWidget::paintEvent(QPaintEvent *) {
   QPainter painter(this);
-  if (!m_queue.isEmpty()) {
-    QImage *img = m_queue.dequeue();
-    painter.drawImage(rect(), *img, img->rect());
+  QImage *img = nullptr;
+  if (imageQueue.pop(img)) {
+    if (img) painter.drawImage(rect(), *img, img->rect());
     delete img;
   }
 }

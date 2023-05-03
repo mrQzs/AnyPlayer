@@ -15,9 +15,6 @@ void initDir() {
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
-  // 注册 QImage* 类型
-  qRegisterMetaType<QImage *>("QImage*");
-
   initDir();
 
   AnyPlay w;

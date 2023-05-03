@@ -10,7 +10,7 @@ class AnyPlay;
 }
 QT_END_NAMESPACE
 
-class VideoDecode;
+class Decode;
 class QThread;
 class DecodeThread;
 
@@ -20,9 +20,6 @@ class AnyPlay : public QMainWindow {
  public:
   AnyPlay(QWidget *parent = nullptr);
   ~AnyPlay();
-
- public slots:
-  void updateImg(QImage *img);
 
  protected:
   void closeEvent(QCloseEvent *e) override;
@@ -42,7 +39,7 @@ class AnyPlay : public QMainWindow {
   Ui::AnyPlay *ui;
   // DecodeThread *m_decodeThread;
   // QThread *m_ddthread;
-  VideoDecode &m_decode;
+  Decode *m_decode;
 };
 
 #endif  // ANYPLAY_H

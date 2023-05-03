@@ -2,11 +2,11 @@
 #ifndef VIDEODECODE_H
 #define VIDEODECODE_H
 
-#include <ffmpegIn.h>
-
 #include <QAtomicInt>
 #include <QImage>
 #include <QThread>
+
+#include "GlobalVar.h"
 
 class QImage;
 
@@ -16,13 +16,12 @@ class VideoDecode : public QThread {
  public:
   static VideoDecode &getInstance();
   void setStopFlag();
-  void setSetFile(const QString &file);
+  void setCodecContext(AVCodecContext *videoCodecContex);
 
  protected:
   void run();
 
  signals:
-  void getNewImage(QImage *image);
 
  private:
   VideoDecode(QObject *parent = nullptr);
@@ -35,8 +34,8 @@ class VideoDecode : public QThread {
 
  private:
   QAtomicInt m_stopFlag;
-  QAtomicInt m_isDecode;
   QString m_file;
+  AVCodecContext *m_videoCodecContex;
 };
 
 #endif  // VIDEODECODE_H

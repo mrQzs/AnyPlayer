@@ -9,32 +9,27 @@
 #include <QImage>
 #include <Qthread>
 
-#include "VideoDecode.h"
+#include "Decode.h"
 #include "ui_AnyPlay.h"
 
 QImage avFrameToQImage(AVFrame *frame);
 
 AnyPlay::AnyPlay(QWidget *parent)
-    : QMainWindow(parent),
-      ui(new Ui::AnyPlay),
-      m_decode(VideoDecode::getInstance()) {
+    : QMainWindow(parent), ui(new Ui::AnyPlay), m_decode(new Decode(this)) {
   ui->setupUi(this);
 
   hideTitle();
 
-  m_decode.start();
+  m_decode->start();
 
-  connect(&m_decode, &VideoDecode::getNewImage, this, &AnyPlay::updateImg);
   connect(ui->OpenBtn, &QPushButton::clicked, this, &AnyPlay::openFile);
 }
 
 AnyPlay::~AnyPlay() {
   delete ui;
-  m_decode.setStopFlag();
-  m_decode.wait();
+  m_decode->setStopFlag();
+  m_decode->wait();
 }
-
-void AnyPlay::updateImg(QImage *img) { ui->widget->setImage(img); }
 
 void AnyPlay::closeEvent(QCloseEvent *e) { QMainWindow::closeEvent(e); }
 
@@ -48,4 +43,4 @@ void AnyPlay::openFile() {
 
 void AnyPlay::hideTitle() {}
 
-void AnyPlay::OpenVideoFile(const QString &file) { m_decode.setSetFile(file); }
+void AnyPlay::OpenVideoFile(const QString &file) { m_decode->setSetFile(file); }
