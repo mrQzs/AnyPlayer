@@ -1,11 +1,10 @@
 
 #include "UpateTimer.h"
 
-#include <QDebug>
-#include <QTimer>
 #include <chrono>
 #include <thread>
 
+#include "GlobalVar.h"
 #include "Logger.hpp"
 
 UpateTimer &UpateTimer::getInstance() {
@@ -14,10 +13,6 @@ UpateTimer &UpateTimer::getInstance() {
 }
 
 void UpateTimer::setStopFlag() { m_stopFlag.storeRelaxed(1); }
-
-void UpateTimer::setFreq(int freq) { m_freq = freq; }
-
-int UpateTimer::getFreq() { return m_freq; }
 
 void UpateTimer::run() {
   Logger::getInstance().log(UpateTimer::tr("线程"),
@@ -32,7 +27,8 @@ void UpateTimer::run() {
     auto duration =
         duration_cast<milliseconds>(now - start).count();  // 计算经过的时间
 
-    if (duration >= m_freq) {  // 检查是否达到指定的计时器间隔（例如，1000毫秒）
+    if (duration >=
+        g_freq.load()) {  // 检查是否达到指定的计时器间隔（例如，1000毫秒）
       emit timeout();
       start = now;  // 更新开始时间
     }
@@ -45,6 +41,6 @@ void UpateTimer::run() {
                             UpateTimer::tr("界面更新线程结束"), LogLevel::INFO);
 }
 
-UpateTimer::UpateTimer() : m_timer(nullptr), m_stopFlag(0), m_freq(41) {}
+UpateTimer::UpateTimer() : m_stopFlag(0) {}
 
 UpateTimer::~UpateTimer() {}

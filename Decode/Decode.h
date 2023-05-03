@@ -7,6 +7,7 @@
 
 class AudioDecode;
 class VideoDecode;
+class SyncThread;
 
 class Decode : public QThread {
   Q_OBJECT
@@ -17,6 +18,9 @@ class Decode : public QThread {
  public:
   void setStopFlag();
   void setSetFile(const QString &file);
+
+ public slots:
+  void slotSync();
 
  protected:
   void run();
@@ -34,6 +38,7 @@ class Decode : public QThread {
 
   AudioDecode &m_audioDecode;
   VideoDecode &m_videoDecode;
+  SyncThread &m_syncThread;
 };
 
 #endif  // DECODE_H

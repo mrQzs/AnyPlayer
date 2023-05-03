@@ -136,6 +136,7 @@ macx {
 SOURCES += \
     Decode/AudioDecode.cpp \
     Decode/Decode.cpp \
+    Decode/SyncThread.cpp \
     Decode/VideoDecode.cpp \
     Timer/UpateTimer.cpp \
     VideoPlayWidget.cpp \
@@ -147,6 +148,7 @@ HEADERS += \
     AnyPlay.h \
     Decode/AudioDecode.h \
     Decode/Decode.h \
+    Decode/SyncThread.h \
     Decode/VideoDecode.h \
     Log/Logger.hpp \
     Timer/UpateTimer.h \

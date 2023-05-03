@@ -25,9 +25,11 @@ void AudioDecode::run() {
                             AudioDecode::tr("音频解码线程启动"),
                             LogLevel::INFO);
 
+  m_stopFlag.storeRelaxed(0);
   AVPacket packet;
   while (!m_stopFlag.loadAcquire()) {
-    if (audioPacketQueue.pop(packet)) {
+    if (!audioPacketQueue.empty()) {
+      audioPacketQueue.pop(packet);
       AVFrame *aframe = av_frame_alloc();
       avcodec_send_packet(m_audioCodecContext, &packet);
       if (avcodec_receive_frame(m_audioCodecContext, aframe) == 0) {
@@ -42,23 +44,28 @@ void AudioDecode::run() {
           fprintf(stderr, "swr_convert_frame() failed\n");
           av_frame_free(&resampledFrame);
         } else {
-          std::lock_guard<std::mutex> lock(mutex);
-          Q_UNUSED(lock);
+          resampledFrame->pts = aframe->pts;
+          resampledFrame->nb_samples = aframe->nb_samples;
+          resampledFrame->pkt_duration = aframe->pkt_duration;
+          resampledFrame->pkt_pos = aframe->pkt_pos;
+
           audioFrameQueue.push(resampledFrame);
         }
       } else
         av_frame_free(&aframe);
 
       av_packet_unref(&packet);
-    } else
+    } else {
       std::this_thread::yield();
+    }
   }
 
   Logger::getInstance().log(AudioDecode::tr("线程"),
                             AudioDecode::tr("音频解码线程释放剩余的队列"),
                             LogLevel::INFO);
 
-  while (audioPacketQueue.pop(packet)) {
+  while (!audioPacketQueue.empty()) {
+    audioPacketQueue.pop(packet);
     av_packet_unref(&packet);
   }
 

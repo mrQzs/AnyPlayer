@@ -9,6 +9,7 @@
 #include "AudioDecode.h"
 #include "GlobalVar.h"
 #include "Logger.hpp"
+#include "SyncThread.h"
 #include "UpateTimer.h"
 #include "VideoDecode.h"
 
@@ -19,11 +20,14 @@ Decode::Decode(QObject *parent)
       m_stopFlag(0),
       m_isDecode(0),
       m_audioDecode(AudioDecode::getInstance()),
-      m_videoDecode(VideoDecode::getInstance()) {
+      m_videoDecode(VideoDecode::getInstance()),
+      m_syncThread{SyncThread::getInstance()} {
   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
     throw std::runtime_error("Failed to initialize SDL: " +
                              std::string(SDL_GetError()));
   }
+
+  connect(&m_syncThread, SIGNAL(startSync()), this, SLOT(slotSync()));
 }
 
 Decode::~Decode() {}
@@ -33,6 +37,17 @@ void Decode::setStopFlag() { m_stopFlag.storeRelaxed(1); }
 void Decode::setSetFile(const QString &file) {
   m_isDecode.storeRelaxed(1);
   m_file = file;
+}
+
+void Decode::slotSync() {
+  double diff = audioPts - videoPts;
+
+  if (abs(diff) > 0.05) {
+    if (diff > 0)
+      g_freq--;
+    else
+      g_freq++;
+  }
 }
 
 void Decode::run() {
@@ -97,7 +112,7 @@ void Decode::decode() {
   }
 
   if (audioStreamIndex == -1) {
-    qDebug() << "No audio stream found";
+    //    qDebug() << "No audio stream found";
     return;
   }
 
@@ -155,9 +170,9 @@ void Decode::decode() {
   int den = (*stream)->avg_frame_rate.den;
   int num = (*stream)->avg_frame_rate.num;
   float rate = (float)num / (float)den;
-  float freq = 1000.0 / rate;
+  int freq = 1000.0 / rate;
 
-  UpateTimer::getInstance().setFreq(freq);
+  g_freq.store(freq);
 
   SDL_Init(SDL_INIT_AUDIO);
 
@@ -197,15 +212,19 @@ void Decode::decode() {
 
   m_videoDecode.setCodecContext(videoCodecContext);
 
+  g_audioStream = formatContext->streams[audioStreamIndex];
+  g_videoStream = formatContext->streams[videoStreamIndex];
+
   m_audioDecode.start();
   m_videoDecode.start();
+  m_syncThread.start();
 
   AVPacket packet;
   while (av_read_frame(formatContext, &packet) >= 0) {
     if (packet.stream_index == audioStreamIndex) {
-      while (!audioPacketQueue.push(packet)) std::this_thread::yield();
+      audioPacketQueue.push(packet);
     } else if (packet.stream_index == videoStreamIndex) {
-      while (!videoPacketQueue.push(packet)) std::this_thread::yield();
+      videoPacketQueue.push(packet);
     }
     if (m_stopFlag.loadAcquire()) break;
   }
@@ -215,6 +234,9 @@ void Decode::decode() {
 
   m_videoDecode.setStopFlag();
   m_videoDecode.wait();
+
+  m_syncThread.setStopFlag();
+  m_syncThread.wait();
 
   SDL_CloseAudio();
   SDL_Quit();
@@ -238,16 +260,14 @@ void audio_callback(void *userdata, Uint8 *stream, int len) {
   while (len > 0) {
     if (bufferSize == 0) {
       {
-        std::lock_guard<std::mutex> lock(mutex);
-        Q_UNUSED(lock);
         if (audioFrameQueue.empty()) {
           return;
         }
-        frame = audioFrameQueue.front();
-        audioFrameQueue.pop();
+        audioFrameQueue.pop(frame);
       }
 
       if (frame) {
+        audioPts = frame->pts * av_q2d(g_audioStream->time_base);
         int numSamples = av_get_bytes_per_sample(audioCodecContext->sample_fmt);
         bufferSize =
             frame->nb_samples * numSamples * audioCodecContext->channels;

@@ -13,8 +13,6 @@ class UpateTimer : public QThread {
  public:
   static UpateTimer &getInstance();
   void setStopFlag();
-  void setFreq(int freq);
-  int getFreq();
 
  protected:
   void run();
@@ -29,9 +27,7 @@ class UpateTimer : public QThread {
   UpateTimer &operator=(const UpateTimer &) = delete;
 
  private:
-  QTimer *m_timer;
   QAtomicInt m_stopFlag;
-  int m_freq;
 };
 
 #endif  // UPATETIMER_H
