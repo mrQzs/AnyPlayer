@@ -20,10 +20,6 @@ INCLUDEPATH += $$PWD/Queue
 INCLUDEPATH += $$PWD/UI/Play
 INCLUDEPATH += $$PWD/Timer
 
-
-
-
-
 greaterThan(QT_MAJOR_VERSION,4){
         TARGET_ARCH=$${QT_ARCH}
 }else{
@@ -34,8 +30,8 @@ win32 {
     #include(3rdpart/breakpad/breakpad.pri)
 
     contains(QMAKE_HOST.arch, x86_64) {
-        INCLUDEPATH += $$PWD/ffmpeg/win64/include
-        LIBS += -L$$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale -lswresample
+        INCLUDEPATH += $$PWD/3rdpart/ffmpeg/win64/include
+        LIBS += -L$$PWD/3rdpart/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale -lswresample
 
         INCLUDEPATH += $$PWD/3rdpart/SDL2/win64/include
         LIBS += -L$$PWD/3rdpart/SDL2/win64/lib -lSDL2
