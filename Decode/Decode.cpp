@@ -212,6 +212,7 @@ void Decode::decode() {
 
   m_videoDecode.setCodecContext(videoCodecContext);
 
+  g_audioCodecContext = audioCodecContext;
   g_audioStream = formatContext->streams[audioStreamIndex];
   g_videoStream = formatContext->streams[videoStreamIndex];
 
@@ -252,7 +253,6 @@ void Decode::decode() {
 }
 
 void audio_callback(void *userdata, Uint8 *stream, int len) {
-  AVCodecContext *audioCodecContext = static_cast<AVCodecContext *>(userdata);
   int bufferSize = 0;
   uint8_t *buffer = nullptr;
   AVFrame *frame = nullptr;
@@ -268,9 +268,10 @@ void audio_callback(void *userdata, Uint8 *stream, int len) {
 
       if (frame) {
         audioPts = frame->pts * av_q2d(g_audioStream->time_base);
-        int numSamples = av_get_bytes_per_sample(audioCodecContext->sample_fmt);
+        int numSamples =
+            av_get_bytes_per_sample(g_audioCodecContext->sample_fmt);
         bufferSize =
-            frame->nb_samples * numSamples * audioCodecContext->channels;
+            frame->nb_samples * numSamples * g_audioCodecContext->channels;
         buffer = frame->data[0];
       }
     }

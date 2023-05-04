@@ -11,19 +11,16 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 QMAKE_CXXFLAGS_RELEASE += $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
-#win32{
-#
-#}
-#win64{
-#    include(breakpad/breakpad.pri)
-#}
-
 INCLUDEPATH += $$PWD/3rdpart
 INCLUDEPATH += $$PWD/Config
 INCLUDEPATH += $$PWD/Decode
 INCLUDEPATH += $$PWD/Global
 INCLUDEPATH += $$PWD/Log
+INCLUDEPATH += $$PWD/Queue
+INCLUDEPATH += $$PWD/UI/Play
 INCLUDEPATH += $$PWD/Timer
+
+
 
 
 
@@ -37,13 +34,18 @@ win32 {
     #include(3rdpart/breakpad/breakpad.pri)
 
     contains(QMAKE_HOST.arch, x86_64) {
-        LIBS += -L $$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale -lswresample
         INCLUDEPATH += $$PWD/ffmpeg/win64/include
+        LIBS += -L$$PWD/ffmpeg/win64/lib -lavcodec -lavformat -lavutil -lswscale -lswresample
 
-        INCLUDEPATH +=  $$PWD/3rdpart/SDL2/win64/include
+        INCLUDEPATH += $$PWD/3rdpart/SDL2/win64/include
         LIBS += -L$$PWD/3rdpart/SDL2/win64/lib -lSDL2
 
         CONFIG(debug, debug|release){
+
+#            INCLUDEPATH += C:/vld/include
+#            DEPENDPATH += C:/vld/include
+#            LIBS += -LC:/vld/lib/Win64 -lvld
+
             MOC_DIR = build/win64/moc/debug
             OBJECTS_DIR = build/win64/obj/debug
             RCC_DIR = build/win64/rcc/debug
@@ -139,7 +141,7 @@ SOURCES += \
     Decode/SyncThread.cpp \
     Decode/VideoDecode.cpp \
     Timer/UpateTimer.cpp \
-    VideoPlayWidget.cpp \
+    UI/Play/VideoPlayWidget.cpp \
     Global/GlobalVar.cpp \
     main.cpp \
     AnyPlay.cpp
@@ -151,10 +153,11 @@ HEADERS += \
     Decode/SyncThread.h \
     Decode/VideoDecode.h \
     Log/Logger.hpp \
+    Queue/CVQueue.h \
+    Queue/ISQueue.h \
     Timer/UpateTimer.h \
-    VideoPlayWidget.h \
+    UI/Play/VideoPlayWidget.h \
     Config/INIReader.hpp \
-    ffmpegIn.h \
     Global/GlobalVar.h
 
 FORMS += \

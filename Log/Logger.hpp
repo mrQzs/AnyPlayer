@@ -67,6 +67,10 @@ class Logger {
   ~Logger() {
     m_exitFlag.store(true);
     m_writeThread.join();
+
+    std::string message;
+    while (m_logQueue.pop(message))
+      ;
   }
 
   LogLevel &operator=(const LogLevel &) = delete;

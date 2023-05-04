@@ -1,8 +1,6 @@
 
 #include "AnyPlay.h"
 
-#include <ffmpegIn.h>
-
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
@@ -10,6 +8,7 @@
 #include <Qthread>
 
 #include "Decode.h"
+#include "GlobalVar.h"
 #include "ui_AnyPlay.h"
 
 QImage avFrameToQImage(AVFrame *frame);
