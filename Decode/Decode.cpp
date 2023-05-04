@@ -8,7 +8,7 @@
 
 #include "AudioDecode.h"
 #include "GlobalVar.h"
-#include "Logger.hpp"
+#include "Logger.h"
 #include "SyncThread.h"
 #include "UpateTimer.h"
 #include "VideoDecode.h"
@@ -59,7 +59,7 @@ void Decode::run() {
       m_isDecode.storeRelaxed(0);
       decode();
     } else
-      QThread::usleep(1);
+      QThread::usleep(500);
   }
 
   Logger::getInstance().log(Decode::tr("线程"), Decode::tr("解码线程结束"),

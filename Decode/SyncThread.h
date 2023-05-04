@@ -2,8 +2,9 @@
 #ifndef SYNCTHREAD_H
 #define SYNCTHREAD_H
 
-#include <QAtomicInt>
 #include <QThread>
+
+class QAtomicInt;
 
 class SyncThread : public QThread {
   Q_OBJECT

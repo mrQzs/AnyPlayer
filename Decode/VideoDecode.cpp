@@ -1,8 +1,10 @@
 
 #include "VideoDecode.h"
 
+#include <QAtomicInt>
+
 #include "GlobalVar.h"
-#include "Logger.hpp"
+#include "Logger.h"
 
 VideoDecode &VideoDecode::getInstance() {
   static VideoDecode instance;
@@ -33,7 +35,7 @@ void VideoDecode::run() {
       }
       av_packet_unref(&packet);
     } else
-      QThread::usleep(1);
+      QThread::usleep(5);
   }
 
   Logger::getInstance().log(VideoDecode::tr("线程"),

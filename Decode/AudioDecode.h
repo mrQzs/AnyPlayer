@@ -2,10 +2,11 @@
 #ifndef AUDIODECODE_H
 #define AUDIODECODE_H
 
-#include <QAtomicInt>
 #include <QThread>
 
 #include "GlobalVar.h"
+
+class QAtomicInt;
 
 class AudioDecode : public QThread {
  public:

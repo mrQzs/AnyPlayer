@@ -2,11 +2,12 @@
 #ifndef VIDEODECODE_H
 #define VIDEODECODE_H
 
-#include <QAtomicInt>
 #include <QImage>
 #include <QThread>
 
 #include "GlobalVar.h"
+
+class QAtomicInt;
 
 class QImage;
 

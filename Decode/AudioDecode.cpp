@@ -1,7 +1,9 @@
 
 #include "AudioDecode.h"
 
-#include "Logger.hpp"
+#include <QAtomicInt>
+
+#include "Logger.h"
 
 AudioDecode &AudioDecode::getInstance() {
   static AudioDecode instance;
@@ -56,7 +58,7 @@ void AudioDecode::run() {
       av_frame_free(&aframe);
       av_packet_unref(&packet);
     } else {
-      QThread::usleep(1);
+      QThread::usleep(5);
     }
   }
 

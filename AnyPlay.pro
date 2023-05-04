@@ -42,9 +42,9 @@ win32 {
 
         CONFIG(debug, debug|release){
 
-#            INCLUDEPATH += C:/vld/include
-#            DEPENDPATH += C:/vld/include
-#            LIBS += -LC:/vld/lib/Win64 -lvld
+            INCLUDEPATH += C:/vld/include
+            DEPENDPATH += C:/vld/include
+            LIBS += -LC:/vld/lib/Win64 -lvld
 
             MOC_DIR = build/win64/moc/debug
             OBJECTS_DIR = build/win64/obj/debug
@@ -136,28 +136,34 @@ macx {
 }
 
 SOURCES += \
+    Config/UpdateFile.cpp \
     Decode/AudioDecode.cpp \
     Decode/Decode.cpp \
     Decode/SyncThread.cpp \
     Decode/VideoDecode.cpp \
+    Log/Logger.cpp \
+    Log/WriteLog.cpp \
     Timer/UpateTimer.cpp \
     UI/Play/VideoPlayWidget.cpp \
     Global/GlobalVar.cpp \
+    config/INIReader.cpp \
     main.cpp \
     AnyPlay.cpp
 
 HEADERS += \
     AnyPlay.h \
+    Config/INIReader.h \
+    Config/UpdateFile.h \
     Decode/AudioDecode.h \
     Decode/Decode.h \
     Decode/SyncThread.h \
     Decode/VideoDecode.h \
-    Log/Logger.hpp \
+    Log/Logger.h \
+    Log/WriteLog.h \
     Queue/CVQueue.h \
     Queue/ISQueue.h \
     Timer/UpateTimer.h \
     UI/Play/VideoPlayWidget.h \
-    Config/INIReader.hpp \
     Global/GlobalVar.h
 
 FORMS += \

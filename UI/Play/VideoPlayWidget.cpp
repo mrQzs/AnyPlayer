@@ -5,7 +5,7 @@
 #include <QThread>
 
 #include "GlobalVar.h"
-#include "Logger.hpp"
+#include "Logger.h"
 #include "UpateTimer.h"
 
 SwsContext *swsCtx = nullptr;

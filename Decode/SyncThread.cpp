@@ -1,10 +1,11 @@
 
 #include "SyncThread.h"
 
+#include <QAtomicInt>
 #include <chrono>
 #include <thread>
 
-#include "Logger.hpp"
+#include "Logger.h"
 
 SyncThread &SyncThread::getInstance() {
   static SyncThread instance;
@@ -20,16 +21,15 @@ void SyncThread::run() {
 
   m_stopFlag.storeRelaxed(0);
   using namespace std::chrono;
-  auto start = high_resolution_clock::now();  // 记录开始时间
+  auto start = high_resolution_clock::now();
 
   while (!m_stopFlag.loadAcquire()) {
-    auto now = high_resolution_clock::now();  // 获取当前时间
-    auto duration =
-        duration_cast<milliseconds>(now - start).count();  // 计算经过的时间
+    auto now = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(now - start).count();
 
-    if (duration >= m_time) {  // 检查是否达到指定的计时器间隔（例如，1000毫秒）
+    if (duration >= m_time) {
       emit startSync();
-      start = now;  // 更新开始时间
+      start = now;
     }
 
     // 休眠一段时间，以减少 CPU 占用

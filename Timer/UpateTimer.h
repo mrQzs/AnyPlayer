@@ -2,9 +2,9 @@
 #ifndef UPATETIMER_H
 #define UPATETIMER_H
 
-#include <QAtomicInt>
 #include <QThread>
 
+class QAtomicInt;
 class QTimer;
 
 class UpateTimer : public QThread {
