@@ -59,7 +59,7 @@ void Decode::run() {
       m_isDecode.storeRelaxed(0);
       decode();
     } else
-      std::this_thread::yield();
+      QThread::usleep(1);
   }
 
   Logger::getInstance().log(Decode::tr("线程"), Decode::tr("解码线程结束"),
@@ -165,6 +165,12 @@ void Decode::decode() {
     Logger::getInstance().log(Decode::tr("音频解码"),
                               Decode::tr("创建AVCodecContext成功"),
                               LogLevel::INFO);
+
+  videoCodecContext->thread_count = 0;  // 0 for auto
+  videoCodecContext->thread_type = FF_THREAD_SLICE | FF_THREAD_FRAME;
+
+  audioCodecContext->thread_count = 0;  // 0 for auto
+  audioCodecContext->thread_type = FF_THREAD_SLICE | FF_THREAD_FRAME;
 
   AVStream **stream = formatContext->streams;
   int den = (*stream)->avg_frame_rate.den;

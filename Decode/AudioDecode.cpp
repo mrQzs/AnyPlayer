@@ -32,7 +32,6 @@ void AudioDecode::run() {
       audioPacketQueue.pop(packet);
       AVFrame *aframe = av_frame_alloc();
       avcodec_send_packet(m_audioCodecContext, &packet);
-
       if (avcodec_receive_frame(m_audioCodecContext, aframe) == 0) {
         AVFrame *resampledFrame = av_frame_alloc();
         resampledFrame->channel_layout =
@@ -57,7 +56,7 @@ void AudioDecode::run() {
       av_frame_free(&aframe);
       av_packet_unref(&packet);
     } else {
-      std::this_thread::yield();
+      QThread::usleep(1);
     }
   }
 

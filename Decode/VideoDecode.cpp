@@ -33,7 +33,7 @@ void VideoDecode::run() {
       }
       av_packet_unref(&packet);
     } else
-      std::this_thread::yield();
+      QThread::usleep(1);
   }
 
   Logger::getInstance().log(VideoDecode::tr("线程"),

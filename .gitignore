@@ -18,3 +18,5 @@
 /bin/win64/release/*.exe
 /bin/win64/debug/Log/*.txt
 /bin/win64/release/Log/*.txt
+/bin/win64/debug/*.ilk
+/bin/win64/debug/*.pdb
