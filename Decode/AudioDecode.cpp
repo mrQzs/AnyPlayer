@@ -28,12 +28,13 @@ void AudioDecode::run() {
                             LogLevel::INFO);
 
   m_stopFlag.storeRelaxed(0);
-  AVPacket packet;
+  AVPacket *packet{0};
+  AVFrame *aframe{0};
   while (!m_stopFlag.loadAcquire()) {
     if (!audioPacketQueue.empty()) {
       audioPacketQueue.pop(packet);
       AVFrame *aframe = av_frame_alloc();
-      avcodec_send_packet(m_audioCodecContext, &packet);
+      avcodec_send_packet(m_audioCodecContext, packet);
       if (avcodec_receive_frame(m_audioCodecContext, aframe) == 0) {
         AVFrame *resampledFrame = av_frame_alloc();
         resampledFrame->channel_layout =
@@ -56,7 +57,7 @@ void AudioDecode::run() {
       }
 
       av_frame_free(&aframe);
-      av_packet_unref(&packet);
+      release_packet(packet);
     } else {
       QThread::usleep(5);
     }
@@ -66,9 +67,14 @@ void AudioDecode::run() {
                             AudioDecode::tr("音频解码线程释放剩余的队列"),
                             LogLevel::INFO);
 
+  while (!audioFrameQueue.empty()) {
+    audioFrameQueue.pop(aframe);
+    if (aframe) av_frame_free(&aframe);
+  }
+
   while (!audioPacketQueue.empty()) {
     audioPacketQueue.pop(packet);
-    av_packet_unref(&packet);
+    release_packet(packet);
   }
 
   Logger::getInstance().log(AudioDecode::tr("线程"),

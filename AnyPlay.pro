@@ -158,6 +158,7 @@ HEADERS += \
     Log/WriteLog.h \
     Queue/CVQueue.h \
     Queue/ISQueue.h \
+    Queue/LFQueue.h \
     Timer/UpateTimer.h \
     UI/Play/VideoPlayWidget.h \
     Global/GlobalVar.h

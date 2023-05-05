@@ -13,8 +13,6 @@
 #include "UpateTimer.h"
 #include "VideoDecode.h"
 
-void audio_callback(void *userdata, Uint8 *stream, int len);
-
 Decode::Decode(QObject *parent)
     : QThread(parent),
       m_stopFlag(0),
@@ -226,11 +224,12 @@ void Decode::decode() {
   m_videoDecode.start();
   m_syncThread.start();
 
-  AVPacket packet;
-  while (av_read_frame(formatContext, &packet) >= 0) {
-    if (packet.stream_index == audioStreamIndex) {
+  AVPacket *packet{0};
+  while ((packet = allocate_packet()) &&
+         av_read_frame(formatContext, packet) >= 0) {
+    if (packet->stream_index == audioStreamIndex) {
       audioPacketQueue.push(packet);
-    } else if (packet.stream_index == videoStreamIndex) {
+    } else if (packet->stream_index == videoStreamIndex) {
       videoPacketQueue.push(packet);
     }
     if (m_stopFlag.loadAcquire()) break;
@@ -256,38 +255,4 @@ void Decode::decode() {
 
   avformat_close_input(&formatContext);
   avformat_free_context(formatContext);
-}
-
-void audio_callback(void *userdata, Uint8 *stream, int len) {
-  int bufferSize = 0;
-  uint8_t *buffer = nullptr;
-  AVFrame *frame = nullptr;
-
-  while (len > 0) {
-    if (bufferSize == 0) {
-      {
-        if (audioFrameQueue.empty()) {
-          return;
-        }
-        audioFrameQueue.pop(frame);
-      }
-
-      if (frame) {
-        audioPts = frame->pts * av_q2d(g_audioStream->time_base);
-        int numSamples =
-            av_get_bytes_per_sample(g_audioCodecContext->sample_fmt);
-        bufferSize =
-            frame->nb_samples * numSamples * g_audioCodecContext->channels;
-        buffer = frame->data[0];
-      }
-    }
-
-    int bytesToCopy = std::min(len, bufferSize);
-    memcpy(stream, buffer, bytesToCopy);
-    stream += bytesToCopy;
-    buffer += bytesToCopy;
-    bufferSize -= bytesToCopy;
-    len -= bytesToCopy;
-    if (frame) av_frame_free(&frame);
-  }
 }

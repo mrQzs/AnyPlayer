@@ -22,18 +22,19 @@ void VideoDecode::run() {
                             VideoDecode::tr("视频解码线程启动"),
                             LogLevel::INFO);
   m_stopFlag.storeRelaxed(0);
-  AVPacket packet;
+  AVPacket *packet{0};
+  AVFrame *frame{0};
   while (!m_stopFlag.loadAcquire()) {
     if (!videoPacketQueue.empty()) {
       videoPacketQueue.pop(packet);
       AVFrame *frame = av_frame_alloc();
-      avcodec_send_packet(m_videoCodecContex, &packet);
+      avcodec_send_packet(m_videoCodecContex, packet);
       if (avcodec_receive_frame(m_videoCodecContex, frame) == 0) {
         videoFrameQueue.push(frame);
       } else {
         av_frame_free(&frame);
       }
-      av_packet_unref(&packet);
+      release_packet(packet);
     } else
       QThread::usleep(5);
   }
@@ -43,17 +44,13 @@ void VideoDecode::run() {
                             LogLevel::INFO);
 
   while (!videoFrameQueue.empty()) {
-    AVFrame *frame = nullptr;
     videoFrameQueue.pop(frame);
-    if (frame) {
-      av_frame_unref(frame);
-      av_frame_free(&frame);
-    }
+    if (frame) av_frame_free(&frame);
   }
 
   while (!videoPacketQueue.empty()) {
     videoPacketQueue.pop(packet);
-    av_packet_unref(&packet);
+    release_packet(packet);
   }
 
   Logger::getInstance().log(VideoDecode::tr("线程"),
