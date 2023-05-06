@@ -5,7 +5,6 @@
 #include <QAtomicInt>
 #include <QImage>
 #include <atomic>
-#include <boost/pool/object_pool.hpp>
 #include <chrono>
 #include <iostream>
 
@@ -21,11 +20,13 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#include "FramePool.h"
 #include "LFQueue.h"
+#include "PacketPool.h"
 
-constexpr size_t QUEUESIZE = 128;
-
-extern boost::object_pool<AVPacket> packet_pool;
+extern PacketPool packet_pool;
+extern FramePool audio_frame_pool;
+extern FramePool video_frame_pool;
 
 extern LFQueue<AVPacket*> audioPacketQueue;
 extern LFQueue<AVFrame*> audioFrameQueue;
@@ -41,9 +42,15 @@ extern AVStream* g_audioStream;
 
 extern std::atomic<int> g_freq;
 
-AVPacket* allocate_packet();
-void release_packet(AVPacket* packet);
-
 void audio_callback(void* userdata, Uint8* stream, int len);
+
+extern SwsContext* swsCtx;
+extern size_t frameW;
+extern size_t widgetW;
+extern size_t frameH;
+extern size_t widgetH;
+extern AVFrame* rgbFrame;
+
+QImage avFrameToQImage(AVFrame* frame);
 
 #endif  // GLOBALVAR_H

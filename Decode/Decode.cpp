@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QMutex>
 #include <QThread>
+#include <chrono>
 
 #include "AudioDecode.h"
 #include "GlobalVar.h"
@@ -51,7 +52,6 @@ void Decode::slotSync() {
 void Decode::run() {
   Logger::getInstance().log(Decode::tr("线程"), Decode::tr("解码线程启动"),
                             LogLevel::INFO);
-
   while (!m_stopFlag.loadAcquire()) {
     if (m_isDecode.loadAcquire()) {
       m_isDecode.storeRelaxed(0);
@@ -119,6 +119,7 @@ void Decode::decode() {
   AVCodecParameters *aCodecParameters =
       formatContext->streams[audioStreamIndex]->codecpar;
 
+  // const AVCodec *videoCodec = avcodec_find_decoder_by_name("h264_qsv");
   const AVCodec *videoCodec = avcodec_find_decoder(vCodecParameters->codec_id);
   const AVCodec *audioCodec = avcodec_find_decoder(aCodecParameters->codec_id);
 
@@ -224,15 +225,35 @@ void Decode::decode() {
   m_videoDecode.start();
   m_syncThread.start();
 
+  //  using namespace std::chrono;
+
+  //  auto start = high_resolution_clock::now();
+
+  //  size_t apacket = 0;
+  //  size_t vpacket = 0;
+
   AVPacket *packet{0};
-  while ((packet = allocate_packet()) &&
+  while ((packet = packet_pool.allocate_packet()) &&
          av_read_frame(formatContext, packet) >= 0) {
+    //    auto now = high_resolution_clock::now();
+    //    auto duration = duration_cast<milliseconds>(now - start).count();
     if (packet->stream_index == audioStreamIndex) {
+      // apacket++;
       audioPacketQueue.push(packet);
     } else if (packet->stream_index == videoStreamIndex) {
+      // vpacket++;
       videoPacketQueue.push(packet);
     }
+
+    //    if (duration >= 10000) {
+    //      qDebug() << "ap" << apacket << "vp" << vpacket;
+    //      apacket = 0;
+    //      vpacket = 0;
+    //      start = now;
+    //    }
+
     if (m_stopFlag.loadAcquire()) break;
+    QThread::usleep(1);
   }
 
   m_audioDecode.setStopFlag();

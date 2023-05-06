@@ -2,6 +2,7 @@
 #include "VideoDecode.h"
 
 #include <QAtomicInt>
+#include <QDebug>
 
 #include "GlobalVar.h"
 #include "Logger.h"
@@ -27,16 +28,17 @@ void VideoDecode::run() {
   while (!m_stopFlag.loadAcquire()) {
     if (!videoPacketQueue.empty()) {
       videoPacketQueue.pop(packet);
-      AVFrame *frame = av_frame_alloc();
+      frame = video_frame_pool.allocate();
       avcodec_send_packet(m_videoCodecContex, packet);
+
       if (avcodec_receive_frame(m_videoCodecContex, frame) == 0) {
         videoFrameQueue.push(frame);
-      } else {
-        av_frame_free(&frame);
-      }
-      release_packet(packet);
+      } else
+        video_frame_pool.release(frame);
+
+      packet_pool.release_packet(packet);
     } else
-      QThread::usleep(5);
+      QThread::usleep(10);
   }
 
   Logger::getInstance().log(VideoDecode::tr("线程"),
@@ -45,12 +47,12 @@ void VideoDecode::run() {
 
   while (!videoFrameQueue.empty()) {
     videoFrameQueue.pop(frame);
-    if (frame) av_frame_free(&frame);
+    if (frame) video_frame_pool.release(frame);
   }
 
   while (!videoPacketQueue.empty()) {
     videoPacketQueue.pop(packet);
-    release_packet(packet);
+    packet_pool.release_packet(packet);
   }
 
   Logger::getInstance().log(VideoDecode::tr("线程"),

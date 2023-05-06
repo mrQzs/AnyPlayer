@@ -16,6 +16,7 @@ INCLUDEPATH += $$PWD/Config
 INCLUDEPATH += $$PWD/Decode
 INCLUDEPATH += $$PWD/Global
 INCLUDEPATH += $$PWD/Log
+INCLUDEPATH += $$PWD/Pool
 INCLUDEPATH += $$PWD/Queue
 INCLUDEPATH += $$PWD/UI/Play
 INCLUDEPATH += $$PWD/Timer
@@ -37,10 +38,9 @@ win32 {
         LIBS += -L$$PWD/3rdpart/SDL2/win64/lib -lSDL2
 
         CONFIG(debug, debug|release){
-
-            INCLUDEPATH += C:/vld/include
-            DEPENDPATH += C:/vld/include
-            LIBS += -LC:/vld/lib/Win64 -lvld
+#            INCLUDEPATH += C:/vld/include
+#            DEPENDPATH += C:/vld/include
+#            LIBS += -LC:/vld/lib/Win64 -lvld
 
             MOC_DIR = build/win64/moc/debug
             OBJECTS_DIR = build/win64/obj/debug
@@ -139,6 +139,8 @@ SOURCES += \
     Decode/VideoDecode.cpp \
     Log/Logger.cpp \
     Log/WriteLog.cpp \
+    Pool/FramePool.cpp \
+    Pool/PacketPool.cpp \
     Timer/UpateTimer.cpp \
     UI/Play/VideoPlayWidget.cpp \
     Global/GlobalVar.cpp \
@@ -156,6 +158,8 @@ HEADERS += \
     Decode/VideoDecode.h \
     Log/Logger.h \
     Log/WriteLog.h \
+    Pool/FramePool.h \
+    Pool/PacketPool.h \
     Queue/CVQueue.h \
     Queue/ISQueue.h \
     Queue/LFQueue.h \

@@ -5,7 +5,7 @@
 #include <QMetaType>
 
 #include "AnyPlay.h"
-#include "vld.h"
+//#include "vld.h"
 
 void initDir() {
   QString LogPath = QDir::currentPath() + "/Log";

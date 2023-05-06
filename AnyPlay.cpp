@@ -11,8 +11,6 @@
 #include "GlobalVar.h"
 #include "ui_AnyPlay.h"
 
-QImage avFrameToQImage(AVFrame *frame);
-
 AnyPlay::AnyPlay(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::AnyPlay), m_decode(new Decode(this)) {
   ui->setupUi(this);

@@ -33,10 +33,10 @@ void AudioDecode::run() {
   while (!m_stopFlag.loadAcquire()) {
     if (!audioPacketQueue.empty()) {
       audioPacketQueue.pop(packet);
-      AVFrame *aframe = av_frame_alloc();
+      AVFrame *aframe = audio_frame_pool.allocate();
       avcodec_send_packet(m_audioCodecContext, packet);
       if (avcodec_receive_frame(m_audioCodecContext, aframe) == 0) {
-        AVFrame *resampledFrame = av_frame_alloc();
+        AVFrame *resampledFrame = audio_frame_pool.allocate();
         resampledFrame->channel_layout =
             av_get_default_channel_layout(m_audioSpec->channels);
         resampledFrame->format = AV_SAMPLE_FMT_S16;
@@ -45,7 +45,7 @@ void AudioDecode::run() {
 
         if (swr_convert_frame(m_swrCtx, resampledFrame, aframe) < 0) {
           fprintf(stderr, "swr_convert_frame() failed\n");
-          av_frame_free(&resampledFrame);
+          audio_frame_pool.release(resampledFrame);
         } else {
           resampledFrame->pts = aframe->pts;
           resampledFrame->nb_samples = aframe->nb_samples;
@@ -56,10 +56,10 @@ void AudioDecode::run() {
         }
       }
 
-      av_frame_free(&aframe);
-      release_packet(packet);
+      audio_frame_pool.release(aframe);
+      packet_pool.release_packet(packet);
     } else {
-      QThread::usleep(5);
+      QThread::usleep(10);
     }
   }
 
@@ -69,12 +69,12 @@ void AudioDecode::run() {
 
   while (!audioFrameQueue.empty()) {
     audioFrameQueue.pop(aframe);
-    if (aframe) av_frame_free(&aframe);
+    if (aframe) audio_frame_pool.release(aframe);
   }
 
   while (!audioPacketQueue.empty()) {
     audioPacketQueue.pop(packet);
-    release_packet(packet);
+    packet_pool.release_packet(packet);
   }
 
   Logger::getInstance().log(AudioDecode::tr("线程"),
