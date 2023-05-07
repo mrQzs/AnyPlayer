@@ -1,7 +1,6 @@
 
 #include "UpateTimer.h"
 
-#include <QAtomicInt>
 #include <chrono>
 #include <thread>
 
@@ -12,8 +11,6 @@ UpateTimer &UpateTimer::getInstance() {
   static UpateTimer instance;
   return instance;
 }
-
-void UpateTimer::setStopFlag() { m_stopFlag.storeRelaxed(1); }
 
 void UpateTimer::run() {
   Logger::getInstance().log(UpateTimer::tr("线程"),
@@ -39,6 +36,6 @@ void UpateTimer::run() {
                             UpateTimer::tr("界面更新线程结束"), LogLevel::INFO);
 }
 
-UpateTimer::UpateTimer() : m_stopFlag(0) {}
+UpateTimer::UpateTimer() {}
 
 UpateTimer::~UpateTimer() {}

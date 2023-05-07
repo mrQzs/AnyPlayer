@@ -2,17 +2,13 @@
 #ifndef UPATETIMER_H
 #define UPATETIMER_H
 
-#include <QThread>
+#include "BaseThread.h"
 
-class QAtomicInt;
-class QTimer;
-
-class UpateTimer : public QThread {
+class UpateTimer : public BaseThread {
   Q_OBJECT
 
  public:
   static UpateTimer &getInstance();
-  void setStopFlag();
 
  protected:
   void run();
@@ -25,9 +21,6 @@ class UpateTimer : public QThread {
   ~UpateTimer();
   UpateTimer(const UpateTimer &) = delete;
   UpateTimer &operator=(const UpateTimer &) = delete;
-
- private:
-  QAtomicInt m_stopFlag;
 };
 
 #endif  // UPATETIMER_H

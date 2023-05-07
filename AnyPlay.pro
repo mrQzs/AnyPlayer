@@ -12,6 +12,7 @@ QMAKE_CXXFLAGS_RELEASE += $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
 QMAKE_LFLAGS_RELEASE += $$QMAKE_LFLAGS_RELEASE_WITH_DEBUGINFO
 
 INCLUDEPATH += $$PWD/3rdpart
+INCLUDEPATH += $$PWD/Base
 INCLUDEPATH += $$PWD/Config
 INCLUDEPATH += $$PWD/Decode
 INCLUDEPATH += $$PWD/Global
@@ -132,10 +133,10 @@ macx {
 }
 
 SOURCES += \
-    Config/UpdateFile.cpp \
+    Base/BaseThread.cpp \
+    Base/Timer.cpp \
     Decode/AudioDecode.cpp \
     Decode/Decode.cpp \
-    Decode/SyncThread.cpp \
     Decode/VideoDecode.cpp \
     Log/Logger.cpp \
     Log/WriteLog.cpp \
@@ -150,11 +151,11 @@ SOURCES += \
 
 HEADERS += \
     AnyPlay.h \
+    Base/BaseThread.h \
+    Base/Timer.h \
     Config/INIReader.h \
-    Config/UpdateFile.h \
     Decode/AudioDecode.h \
     Decode/Decode.h \
-    Decode/SyncThread.h \
     Decode/VideoDecode.h \
     Log/Logger.h \
     Log/WriteLog.h \

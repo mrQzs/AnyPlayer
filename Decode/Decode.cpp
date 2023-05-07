@@ -10,8 +10,7 @@
 #include "AudioDecode.h"
 #include "GlobalVar.h"
 #include "Logger.h"
-#include "SyncThread.h"
-#include "UpateTimer.h"
+#include "Timer.h"
 #include "VideoDecode.h"
 
 Decode::Decode(QObject *parent)
@@ -20,13 +19,13 @@ Decode::Decode(QObject *parent)
       m_isDecode(0),
       m_audioDecode(AudioDecode::getInstance()),
       m_videoDecode(VideoDecode::getInstance()),
-      m_syncThread{SyncThread::getInstance()} {
+      m_syncThread{new Timer(this, Decode::tr("同步音视频线程"), 250)} {
   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
     throw std::runtime_error("Failed to initialize SDL: " +
                              std::string(SDL_GetError()));
   }
 
-  connect(&m_syncThread, SIGNAL(startSync()), this, SLOT(slotSync()));
+  connect(m_syncThread, SIGNAL(timeout()), this, SLOT(slotSync()));
 }
 
 Decode::~Decode() {}
@@ -223,7 +222,7 @@ void Decode::decode() {
 
   m_audioDecode.start();
   m_videoDecode.start();
-  m_syncThread.start();
+  m_syncThread->start();
 
   //  using namespace std::chrono;
 
@@ -262,11 +261,8 @@ void Decode::decode() {
   m_videoDecode.setStopFlag();
   m_videoDecode.wait();
 
-  m_syncThread.setStopFlag();
-  m_syncThread.wait();
-
-  SDL_CloseAudio();
-  SDL_Quit();
+  m_syncThread->setStopFlag();
+  m_syncThread->wait();
 
   avcodec_close(videoCodecContext);
   avcodec_close(audioCodecContext);

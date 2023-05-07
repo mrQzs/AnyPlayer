@@ -7,7 +7,7 @@
 
 class AudioDecode;
 class VideoDecode;
-class SyncThread;
+class Timer;
 
 class Decode : public QThread {
   Q_OBJECT
@@ -38,7 +38,7 @@ class Decode : public QThread {
 
   AudioDecode &m_audioDecode;
   VideoDecode &m_videoDecode;
-  SyncThread &m_syncThread;
+  Timer *m_syncThread;
 };
 
 #endif  // DECODE_H

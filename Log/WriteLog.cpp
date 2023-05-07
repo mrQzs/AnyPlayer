@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "GlobalVar.h"
-#include "UpdateFile.h"
+#include "Timer.h"
 
 QString g_currentTime;
 QString g_fileName;
@@ -41,8 +41,8 @@ void WriteLog::run() {
       QThread::usleep(10);
   }
 
-  m_updateFile.setStopFlag();
-  m_updateFile.wait();
+  m_updateFile->setStopFlag();
+  m_updateFile->wait();
 
   QString message;
   while (logQueue.pop(message)) {
@@ -93,11 +93,12 @@ QString WriteLog::getFile() {
 }
 
 WriteLog::WriteLog(QObject *parent)
-    : QThread{parent}, m_updateFile{UpdateFile::getInstance()} {
+    : QThread{parent},
+      m_updateFile{new Timer(this, WriteLog::tr("日志文件更新线程"), 360000)} {
   g_currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd");
   g_fileName = QDir::currentPath() + "/Log/log-" + g_currentTime;
-  m_updateFile.start();
-  connect(&m_updateFile, SIGNAL(timeout()), this, SLOT(updateFile()));
+  connect(m_updateFile, SIGNAL(timeout()), this, SLOT(updateFile()));
+  m_updateFile->start();
 }
 
 WriteLog::~WriteLog() {}

@@ -8,7 +8,7 @@
 #include "boost/lockfree/spsc_queue.hpp"
 
 class QAtomicInt;
-class UpdateFile;
+class Timer;
 
 extern QString currentTime;
 extern QString fileName;
@@ -41,7 +41,7 @@ class WriteLog : public QThread {
 
  private:
   QAtomicInt m_stopFlog;
-  UpdateFile& m_updateFile;
+  Timer* m_updateFile;
 };
 
 #endif  // WRITELOG_H

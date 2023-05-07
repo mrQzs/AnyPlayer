@@ -63,6 +63,9 @@ void AudioDecode::run() {
     }
   }
 
+  SDL_CloseAudio();
+  SDL_Quit();
+
   Logger::getInstance().log(AudioDecode::tr("线程"),
                             AudioDecode::tr("音频解码线程释放剩余的队列"),
                             LogLevel::INFO);
