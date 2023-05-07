@@ -135,6 +135,7 @@ macx {
 SOURCES += \
     Base/BaseThread.cpp \
     Base/Timer.cpp \
+    Config/INIReader.cpp \
     Decode/AudioDecode.cpp \
     Decode/Decode.cpp \
     Decode/VideoDecode.cpp \
@@ -145,7 +146,6 @@ SOURCES += \
     Timer/UpateTimer.cpp \
     UI/Play/VideoPlayWidget.cpp \
     Global/GlobalVar.cpp \
-    config/INIReader.cpp \
     main.cpp \
     AnyPlay.cpp
 
